@@ -1,6 +1,0 @@
-django
-celery
-django-celery
-django-celery-beat
-redis
-django-redis

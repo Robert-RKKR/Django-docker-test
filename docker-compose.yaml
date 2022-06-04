@@ -1,0 +1,114 @@
+version: "3.9"
+   
+services:
+  db:
+    container_name: autocli_postgres
+    image: postgres
+    environment:
+      - POSTGRES_USER=autpcli_db_administrator
+      - POSTGRES_PASSWORD=3ru8!@3urw3!#$hruh3quQEQ#2q
+      - POSTGRES_DB=autocli_db
+    # ports:
+    #   - "5432:5432"
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+  redis:
+    image: redis
+    container_name: autocli_redis
+    # ports:
+    #   - "6378:6379"
+  web:
+    build: ./backend
+    container_name: autocli_backend
+    restart: always
+    env_file:
+      - ./backend/.env
+    command: > 
+      "
+      python manage.py makemigrations
+      python manage.py migrate
+      python manage.py runserver 0.0.0.0:8000
+      "
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
+      - redis
+#   celery-default:
+#     build: .
+#     restart: always
+#     command: celery -A djangito.celeryapp:app worker -Q default -n djangito.%%h --without-gossip --without-mingle --without-heartbeat --loglevel=INFO --max-memory-per-child=512000 --concurrency=1
+#     env_file:
+#       - .env
+#     volumes:
+#       - .:/code
+#     links:
+#       - db
+#       - redis
+#     depends_on:
+#       - db
+#       - redis
+#   celery-logger:
+#     build: .
+#     restart: always
+#     command: celery -A djangito.celeryapp:app worker -Q logger -n djangito.%%h --without-gossip --without-mingle --without-heartbeat --loglevel=INFO --max-memory-per-child=512000 --concurrency=1
+#     env_file:
+#       - .env
+#     volumes:
+#       - .:/code
+#     links:
+#       - db
+#       - redis
+#     depends_on:
+#       - db
+#       - redis
+#   celery-collect:
+#     build: .
+#     restart: always
+#     command: celery -A djangito.celeryapp:app worker -Q collect -n djangito.%%h --without-gossip --without-mingle --without-heartbeat --loglevel=INFO --max-memory-per-child=512000 --concurrency=1
+#     env_file:
+#       - .env
+#     volumes:
+#       - .:/code
+#     links:
+#       - db
+#       - redis
+#     depends_on:
+#       - db
+#       - redis
+#   celery-request:
+#     build: .
+#     restart: always
+#     command: celery -A djangito.celeryapp:app worker -Q request -n djangito.%%h --without-gossip --without-mingle --without-heartbeat --loglevel=INFO --max-memory-per-child=512000 --concurrency=1
+#     env_file:
+#       - .env
+#     volumes:
+#       - .:/code
+#     links:
+#       - db
+#       - redis
+#     depends_on:
+#       - db
+#       - redis
+#   celery-beat:
+#     build: .
+#     restart: always
+#     command: celery -A djangito.celeryapp:app beat -S redbeat.RedBeatScheduler  --loglevel=DEBUG --pidfile /tmp/celerybeat.pid
+#     env_file:
+#       - .env
+#     volumes:
+#       - .:/code
+#     links:
+#       - db
+#       - redis
+#     depends_on:
+#       - db
+#       - redis
+# networks:
+#   commandapp-network:
+#     driver: bridge
